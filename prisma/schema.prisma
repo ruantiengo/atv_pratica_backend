@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Cidade{
+  id Int @id @default(autoincrement())
+  nome String
+  estadoId Int
+  estado Estado  @relation(fields: [estadoId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+  pessoas Pessoa[]
+  locaisColeta LocalColeta[]
+  unidade Unidade[]
+}
+
+model Estado{
+  id Int @id @default(autoincrement())
+  nome String
+  sigla String
+  createdAt DateTime @default(now())
+  cidades Cidade[]
+  updatedAt DateTime?
+}
+
+model Pessoa{
+  id Int @id @default(autoincrement())
+  nome String
+  rua String
+  numero String
+  complemento String?
+  documento String?
+  cidadeId Int
+  cidade Cidade @relation(fields: [cidadeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+  tipoSanguineoId Int?
+  doacao Doacao[]
+  tipoSanguineo TipoSanguineo? @relation(fields: [tipoSanguineoId], references: [id])
+}
+
+model TipoSanguineo{
+  id Int @id @default(autoincrement())
+  tipo String
+  fator String
+  validade DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime? 
+  pessoas Pessoa[]
+}
+
+model Produto{
+  id Int @id @default(autoincrement())
+  etiqueta String
+  validade DateTime?  
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+  distribuicao Distribuicao[] 
+}
+
+model Doacao{
+  id Int @id @default(autoincrement())
+  pessoaId Int?
+  pessoa Pessoa? @relation(fields: [pessoaId], references: [id])
+  localColetaId Int?
+  localColeta LocalColeta? @relation(fields: [localColetaId], references: [id])
+  data String
+  createdAt DateTime @default(now())
+  updatedAt DateTime? 
+}
+
+model LocalColeta{
+  id Int @id @default(autoincrement())
+  nome String
+  rua String
+  numero String
+  complemento String
+  cidadeId Int
+  cidade Cidade @relation(fields: [cidadeId], references: [id])
+  doacoes Doacao[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime? 
+}
+
+model Unidade{
+  id Int @id @default(autoincrement())
+  nome String
+  rua String
+  numero String
+  complemento String
+  cidadeId Int
+  cidade Cidade @relation(fields: [cidadeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime? 
+  distribuicoes Distribuicao[]
+}
+
+model Distribuicao{
+  id Int @id @default(autoincrement())
+  produtoId Int
+  produto Produto @relation(fields: [produtoId], references: [id])
+  unidadeId Int
+  unidade Unidade @relation(fields: [unidadeId], references: [id])
+  data String
+  createdAt DateTime @default(now())
+  updatedAt DateTime? 
+}
